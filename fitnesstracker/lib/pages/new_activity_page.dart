@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:fitnesstracker/model/database_helper.dart';
 import 'package:fitnesstracker/service/activity_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -19,6 +18,7 @@ class _NewActivityPageState extends State<NewActivityPage> {
   String _minKM = "--:--";
   String timerText = "00:00:00";
   Timer? _timer;
+  double distance = 0;
   DateTime start = DateTime.now(), startPause = DateTime.now();
   Duration pauseDuration = Duration.zero;
   String _lastUpdate="none"; // update frequency
@@ -101,6 +101,9 @@ class _NewActivityPageState extends State<NewActivityPage> {
       ),
     ).listen((Position position) {
       setState(() {
+        if(!positions.isEmpty){
+          distance += Geolocator.distanceBetween(positions.last.latitude, positions.last.longitude, position.latitude, position.longitude);
+        }
         positions.add(position);
         if (position.speed > 0.2) {
           _currentSpeed = position.speed * 3.6;
@@ -165,6 +168,14 @@ class _NewActivityPageState extends State<NewActivityPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text(
+            'Distance:',
+            style: TextStyle(fontSize: 24),
+          ),
+          Text(
+            "${(distance/1000).toStringAsFixed(2)} km",
+            style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+          ),
           Text(
             'Timer:',
             style: TextStyle(fontSize: 24),
