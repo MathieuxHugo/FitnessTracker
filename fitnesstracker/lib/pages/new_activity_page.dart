@@ -19,7 +19,8 @@ class _NewActivityPageState extends State<NewActivityPage> {
   String _minKM = "--:--";
   String timerText = "00:00:00";
   Timer? _timer;
-  int _elapsedSeconds = 0;
+  DateTime start = DateTime.now(), startPause = DateTime.now();
+  Duration pauseDuration = Duration.zero;
   String _lastUpdate="none"; // update frequency
   bool _isTracking = false; // Track if tracking is started
   bool _isPaused = false;  // Track if tracking has been paused
@@ -38,14 +39,11 @@ class _NewActivityPageState extends State<NewActivityPage> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    start = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if(!_isPaused){
-          _elapsedSeconds++;
-          timerText = _formatTime(_elapsedSeconds);
-          if(_elapsedSeconds%30==0){
-            flutterTts.speak(_minKM.replaceAll(':', ' '));
-          }
+          timerText = _formatTime((DateTime.now().difference(start)-pauseDuration).inSeconds);
         }
       });
     });
@@ -127,7 +125,6 @@ class _NewActivityPageState extends State<NewActivityPage> {
     setState(() {
       _isTracking = true;
       _isPaused = false;
-      _elapsedSeconds = 0;
       timerText = "00:00:00";
     });
     _startTimer();
@@ -137,6 +134,7 @@ class _NewActivityPageState extends State<NewActivityPage> {
   void _onPause() {
     setState(() {
       _isPaused = true;
+      startPause = DateTime.now();
     });
   }
 
@@ -144,6 +142,7 @@ class _NewActivityPageState extends State<NewActivityPage> {
     setState(() {
       _isPaused = false;
       _isTracking = true;
+      pauseDuration += DateTime.now().difference(startPause);
     });
     _startTrackingSpeed();
   }
@@ -154,7 +153,6 @@ class _NewActivityPageState extends State<NewActivityPage> {
       setState(() {
         _isTracking = false;
         _isPaused = false;
-        _elapsedSeconds = 0;
         timerText = "00:00:00";
       });
       _stopTimer();
