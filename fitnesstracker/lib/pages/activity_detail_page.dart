@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -5,26 +7,47 @@ import '../model/Activity.dart';
 import '../model/PositionData.dart';
 import 'run_map_page.dart';
 
-
-class ActivityDetailPage extends StatefulWidget{
-
+class ActivityDetailPage extends StatefulWidget {
   final Activity activity;
+
   const ActivityDetailPage({required this.activity});
 
   @override
   State<ActivityDetailPage> createState() => _ActivityDetailPageState();
-
 }
 
 class _ActivityDetailPageState extends State<ActivityDetailPage> {
-  double avgSpeed = 0.0;
-  double threshold = 10.5;
-  List<double> pacePerKm = [];
+  double paceInterval = 20;
+  double speedThreshold = 1.5, accuracyThreshold = 30;
+  double maxSpeedThreshold = 5, maxAccuracyThreshold = 50;
+  int minPace = 4;
+  List<int> pacePerKm = [];
   List<PositionData> outliers = [];
+  double totalDistance = 0;
+  int totalTime =0 ;
+  String thresholdParameter = "Min speed";
+  List<DropdownMenuEntry> parameters = [
+    DropdownMenuEntry(value: "Accuracy", label: "Accuracy"),
+    DropdownMenuEntry(value: "Speed accuracy", label: "Speed accuracy"),
+    DropdownMenuEntry(value: "Min speed", label: "Min speed")
+  ];
+
+  _getTitlesKM(double value, TitleMeta meta) {
+    if (value.toInt() % (pacePerKm.length / 8.0).floor() == 0) {
+      return Text('${value.toInt() + 1}');
+    } else {
+      return SizedBox();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _updateValues();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _updateValues();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Activity Details'),
@@ -33,36 +56,55 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
+            Text(
+              'Speed',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             Slider(
-              min: 1,
-              max: 20,
-              divisions: 20,
-              value: threshold,
-              label: threshold.toStringAsFixed(2),
+              min: 0,
+              max: maxSpeedThreshold,
+              divisions: 10,
+              value: speedThreshold,
+              label: speedThreshold.toStringAsFixed(2),
               onChanged: (value) {
                 setState(() {
-                  threshold = value;
+                  speedThreshold = value;
+                  _updateValues();
                 });
               },
             ),
             Text(
-              "Ratio outliers: ${(outliers.length/widget.activity.positions.length).toStringAsFixed(2)}",
-              style: TextStyle(fontSize: 18),
+              'Accuracy',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Slider(
+              min: 0,
+              max: maxAccuracyThreshold,
+              divisions: 10,
+              value: accuracyThreshold,
+              label: accuracyThreshold.toStringAsFixed(2),
+              onChanged: (value) {
+                setState(() {
+                  accuracyThreshold = value;
+                  _updateValues();
+                });
+              },
             ),
             Text(
-              "Total Distance: ${(widget.activity.totalDistance / 1000)
-                  .toStringAsFixed(3)} km",
-              style: TextStyle(fontSize: 18),
+              "Ratio outliers: ${(outliers.length / widget.activity.positions.length).toStringAsFixed(2)}",
+              style: const TextStyle(fontSize: 18),
             ),
             Text(
-              "Total Time: ${_formatDuration(-widget.activity.totalTime)}",
-              style: TextStyle(fontSize: 18),
+              "Total Distance: ${(totalDistance / 1000).toStringAsFixed(3)} km",
+              style: const TextStyle(fontSize: 18),
             ),
             Text(
-              "Average Pace: ${_formatDuration((-widget.activity.totalTime /
-                  (widget.activity.totalDistance / 1000))
-                  .floor())} min/km or ${_formatPace(avgSpeed)}",
-              style: TextStyle(fontSize: 18),
+              "Total Time: ${_formatDuration(totalTime)}",
+              style: const TextStyle(fontSize: 18),
+            ),
+            Text(
+              "Average Pace: ${_formatDuration(((totalTime / (totalDistance / 1000)).floor()))} min/km",
+              style: const TextStyle(fontSize: 18),
             ),
             SizedBox(height: 24),
 
@@ -76,38 +118,55 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
+                  minY: 1.0 * minPace,
                   barGroups: pacePerKm
                       .asMap()
                       .entries
                       .map(
-                        (entry) =>
-                        BarChartGroupData(
+                        (entry) => BarChartGroupData(
                           x: entry.key,
                           barRods: [
                             BarChartRodData(
-                              toY: entry.value,
+                              toY: 1.0 * entry.value,
                               color: Colors.blue,
-                              width: 20,
+                              width: 10,
                             ),
                           ],
                         ),
-                  )
+                      )
                       .toList(),
                   titlesData: FlTitlesData(
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        getTitlesWidget: (double value, TitleMeta meta) {
-                          return Text('${value.toInt() + 1} km');
-                        },
+                        getTitlesWidget: (value, meta) =>
+                            _getTitlesKM(value, meta),
+                      ),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) =>
+                            _getTitlesKM(value, meta),
                       ),
                     ),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
+                        interval: paceInterval,
                         reservedSize: 40,
                         getTitlesWidget: (double value, TitleMeta meta) {
-                          return Text('${value.toStringAsFixed(1)}');
+                          return Text(_formatDuration(value.floor()));
+                        },
+                      ),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: paceInterval,
+                        reservedSize: 40,
+                        getTitlesWidget: (double value, TitleMeta meta) {
+                          return Text(_formatDuration(value.floor()));
                         },
                       ),
                     ),
@@ -128,16 +187,15 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
               itemBuilder: (context, index) {
                 final outlier = outliers[index];
                 return ListTile(
-                  title: Text("Speed : ${outlier.currentSpeed}"),
+                  title: Text("Accuracy : ${outlier.accuracy}"),
                   subtitle: Text(
-                      "Meter: ${outlier.distance}m\nAccuracy: ${outlier
-                          .accuracy}m/s"),
+                      "Meter: ${outlier.distance}m\nTime: ${widget.activity.startTime.add(Duration(seconds: outlier.time))}"),
                   isThreeLine: true,
                   onTap: () {},
                 );
               },
             ),
-            RunMapPage(positions: widget.activity.positions),
+            //RunMapPage(positions: widget.activity.positions),
           ],
         ),
       ),
@@ -149,16 +207,16 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     int hours = totalSeconds ~/ 3600;
     int minutes = (totalSeconds % 3600) ~/ 60;
     int seconds = totalSeconds % 60;
-    return [if (hours > 0) hours, minutes, seconds].map((e) =>
-        e.toString().padLeft(2, '0')).join(':');
+    return [if (hours > 0) hours, minutes, seconds]
+        .map((e) => e.toString().padLeft(2, '0'))
+        .join(':');
   }
 
   // Format pace in min/km
   String _formatPace(double speed) {
-    if (speed!=0){
+    if (speed != 0) {
       return _formatDuration((1000 / speed).floor());
-    }
-    else{
+    } else {
       return "--:--";
     }
   }
@@ -166,36 +224,39 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   void _updateValues() {
     pacePerKm = [];
     outliers = [];
-    avgSpeed = 0.0;
-    int cpt = 0;
     int previousTime = 0;
-    double speedPrevDistance = 0;
-    int speedPrevTime = 0;
+    PositionData prevPosition = widget.activity.positions.first;
+    minPace = 1000;
+    totalTime = 0;
+    totalDistance = 0;
     for (PositionData position in widget.activity.positions) {
-      if (position.accuracy > threshold) {
+      if (!applyThreshold(position, prevPosition)) {
         outliers.add(position);
-      }
-      else {
-        cpt++;
-        if(position.time!=speedPrevTime){
-          avgSpeed += (position.distance-speedPrevDistance)/(position.time-speedPrevTime);
-        }
-        speedPrevTime = position.time;
-        speedPrevDistance = position.distance;
-        if (position.distance >= (pacePerKm.length + 1) * 1000) {
-          pacePerKm.add((position.time - previousTime) /
-              60.0); // Convert seconds to minutes for pace
-          previousTime = position.time; // Reset for the next kilometer
+      } else {
+        int timeSinceLast = position.time - prevPosition.time;
+        totalTime+=timeSinceLast;
+        totalDistance += position.distance - prevPosition.distance;
+        if (totalDistance >= (pacePerKm.length + 1) * 1000) {
+          int pace = (totalTime - previousTime);
+          minPace = min(minPace, pace);
+          pacePerKm.add(pace); // Convert seconds to minutes for pace
+          previousTime = totalTime; // Reset for the next kilometer
         }
       }
+      prevPosition = position;
     }
-    PositionData last = widget.activity.positions.last;
-    if (last.distance % 1000 > 200) {
-      pacePerKm.add(
-          ((widget.activity.positions.last.time - previousTime) / 60.0) /
-              ((last.distance % 1000) /
-                  1000)); // Add final segment if incomplete km
+
+    if ((totalDistance) % 1000 > 200) {
+      pacePerKm.add(((totalTime- previousTime) /
+              (((totalDistance) % 1000) / 1000))
+          .floor()); // Add final segment if incomplete km
     }
-    avgSpeed = (cpt<=1)?0:(-avgSpeed / (cpt-1));
+  }
+
+  bool applyThreshold(PositionData position, PositionData prevPosition) {
+    return ((1.0 * position.distance - prevPosition.distance) /
+                (position.time - prevPosition.time) >
+            speedThreshold) &&
+        position.accuracy < accuracyThreshold;
   }
 }
