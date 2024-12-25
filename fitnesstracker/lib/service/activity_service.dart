@@ -1,13 +1,14 @@
 import 'package:geolocator/geolocator.dart';
 
-import '../model/Activity.dart';
-import '../model/PositionData.dart';
-import '../model/database_helper.dart';
+import '../model/activity_data.dart';
+import '../model/position_data.dart';
+import '../repository/activity_repository.dart';
 
 class ActivityService {
   final double accuracyThreshold;
   List<PositionData> positionsData = [];
   ActivityService({this.accuracyThreshold = 50.0});
+  ActivityRepository activityRepository = ActivityRepository();
 
   static PositionData positionToPositionData(Position position, double distance, int time){
     return PositionData(latitude: position.latitude, longitude: position.longitude, time: time, distance: distance, accuracy: position.accuracy, currentSpeed: position.speed, speedAccuracy: position.speedAccuracy);
@@ -67,7 +68,7 @@ class ActivityService {
       throw "Bad Accuracy";
     }
     else{
-      Activity activity = Activity(
+      ActivityData activity = ActivityData(
         id: DateTime.now().toIso8601String(),
         startTime: positions.first.timestamp,
         totalTime: positions.first.timestamp.difference(positions.last.timestamp).inSeconds,
@@ -78,7 +79,11 @@ class ActivityService {
     }
   }
 
-  Future<void> _saveActivityToDatabase(Activity activity) async {
-    DatabaseHelper().saveActivity(activity);
+  Future<List<ActivityData>> getAllActivities(){
+    return activityRepository.retrieveActivities();
+  }
+
+  Future<void> _saveActivityToDatabase(ActivityData activityData) async {
+    activityRepository.saveActivity(activityData);
   }
 }

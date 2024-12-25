@@ -1,12 +1,12 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../model/PositionData.dart';
-import '../model/Activity.dart';
+import '../model/position_data.dart';
+import '../model/activity_data.dart';
 
-class DatabaseHelper {
-  static final DatabaseHelper _instance = DatabaseHelper._internal();
-  factory DatabaseHelper() => _instance;
-  DatabaseHelper._internal();
+class ActivityRepository {
+  static final ActivityRepository _instance = ActivityRepository._internal();
+  factory ActivityRepository() => _instance;
+  ActivityRepository._internal();
 
   Database? _database;
 
@@ -54,9 +54,9 @@ class DatabaseHelper {
   }
 
   // Save an Activity and its Positions
-  Future<void> saveActivity(Activity activity) async {
+  Future<void> saveActivity(ActivityData activity) async {
     final db = await database;
-
+    
     // Insert activity details
     await db.insert(
       'activities',
@@ -89,12 +89,12 @@ class DatabaseHelper {
   }
 
   // Retrieve all Activities with associated PositionData
-  Future<List<Activity>> retrieveActivities() async {
+  Future<List<ActivityData>> retrieveActivities() async {
     final db = await database;
 
     // Get all activities
     final activityMaps = await db.query('activities');
-    List<Activity> activities = [];
+    List<ActivityData> activities = [];
 
     for (var activityMap in activityMaps) {
       // Get associated positions for each activity
@@ -116,7 +116,7 @@ class DatabaseHelper {
         );
       }).toList();
 
-      activities.add(Activity(
+      activities.add(ActivityData(
         id: activityMap['id'] as String,
         startTime: DateTime.parse(activityMap['startTime'] as String),
         positions: positions,

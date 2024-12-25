@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../model/Activity.dart';
-import '../model/PositionData.dart';
+import '../model/activity_data.dart';
+import '../model/position_data.dart';
 import 'run_map_page.dart';
 
 class ActivityDetailPage extends StatefulWidget {
-  final Activity activity;
+  final ActivityData activity;
 
   const ActivityDetailPage({required this.activity});
 
@@ -24,7 +24,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   List<int> pacePerKm = [];
   List<PositionData> outliers = [];
   double totalDistance = 0;
-  int totalTime =0 ;
+  int totalTime = 0;
+
   String thresholdParameter = "Min speed";
   List<DropdownMenuEntry> parameters = [
     DropdownMenuEntry(value: "Accuracy", label: "Accuracy"),
@@ -234,7 +235,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
         outliers.add(position);
       } else {
         int timeSinceLast = position.time - prevPosition.time;
-        totalTime+=timeSinceLast;
+        totalTime += timeSinceLast;
         totalDistance += position.distance - prevPosition.distance;
         if (totalDistance >= (pacePerKm.length + 1) * 1000) {
           int pace = (totalTime - previousTime);
@@ -247,9 +248,9 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     }
 
     if ((totalDistance) % 1000 > 200) {
-      pacePerKm.add(((totalTime- previousTime) /
-              (((totalDistance) % 1000) / 1000))
-          .floor()); // Add final segment if incomplete km
+      pacePerKm.add(
+          ((totalTime - previousTime) / (((totalDistance) % 1000) / 1000))
+              .floor()); // Add final segment if incomplete km
     }
   }
 

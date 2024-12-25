@@ -1,7 +1,8 @@
+import 'package:fitnesstracker/service/activity_service.dart';
 import 'package:flutter/material.dart';
 
-import '../model/Activity.dart';
-import '../model/database_helper.dart';
+import '../model/activity_data.dart';
+import '../repository/activity_repository.dart';
 import 'activity_detail_page.dart';
 
 class PreviousActivitiesPage extends StatefulWidget {
@@ -10,7 +11,9 @@ class PreviousActivitiesPage extends StatefulWidget {
 }
 
 class _PreviousActivitiesPageState extends State<PreviousActivitiesPage> {
-  List<Activity> _activities = [];
+  List<ActivityData> _activities = [];
+
+  ActivityService activityService = ActivityService();
 
   @override
   void initState() {
@@ -20,7 +23,7 @@ class _PreviousActivitiesPageState extends State<PreviousActivitiesPage> {
 
   Future<void> _loadActivities() async {
     // Fetch activities from the database
-    List<Activity> activities = await DatabaseHelper().retrieveActivities();
+    List<ActivityData> activities = await activityService.getAllActivities();
     setState(() {
       _activities = activities;
     });

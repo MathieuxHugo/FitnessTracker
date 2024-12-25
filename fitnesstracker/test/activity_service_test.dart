@@ -1,4 +1,4 @@
-import 'package:fitnesstracker/model/PositionData.dart';
+import 'package:fitnesstracker/model/position_data.dart';
 import 'package:fitnesstracker/service/activity_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
