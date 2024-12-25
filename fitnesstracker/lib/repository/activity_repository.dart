@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'PositionData.dart';
-import 'Activity.dart';
+import '../model/PositionData.dart';
+import '../model/Activity.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();

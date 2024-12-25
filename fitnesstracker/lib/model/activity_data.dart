@@ -1,13 +1,13 @@
 
 import 'PositionData.dart';
 
-class Activity {
+class ActivityData {
   final String id;
   final DateTime startTime;
   final List<PositionData> positions;
   final double totalDistance;
   final int totalTime; // in seconds
-  Activity({
+  ActivityData({
     required this.id,
     required this.startTime,
     required this.positions,
