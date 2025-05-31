@@ -2,9 +2,11 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../model/running_interval.dart';
 import '../model/running_plan.dart';
+import 'dart:developer';
 
 class RunningPlanRepository {
-  static final RunningPlanRepository _instance = RunningPlanRepository._internal();
+  static final RunningPlanRepository _instance =
+      RunningPlanRepository._internal();
   factory RunningPlanRepository() => _instance;
   RunningPlanRepository._internal();
 
@@ -18,6 +20,7 @@ class RunningPlanRepository {
 
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
+
     final path = join(dbPath, 'running_plan_database.db');
 
     return await openDatabase(

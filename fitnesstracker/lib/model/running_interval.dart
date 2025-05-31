@@ -1,21 +1,12 @@
-class RunningInterval {
-  String name;
-  int duration; // Either in seconds or meters
-  bool isDurationInSeconds;
-  int pace; // in seconds
+import 'package:drift/drift.dart';
 
-  RunningInterval({
-    required this.name,
-    required this.duration,
-    required this.isDurationInSeconds,
-    required this.pace,
-  });
-
-  Map<String, dynamic> toJson() => {
-    'name': name,
-    'duration': duration,
-    'isDurationInSeconds': isDurationInSeconds,
-    'pace': pace,
-  };
+@DataClassName('RunningIntervalData')
+class RunningIntervals extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get planName =>
+      text().customConstraint('REFERENCES running_plans(name)')();
+  TextColumn get name => text()();
+  IntColumn get duration => integer()(); // Either in seconds or meters
+  BoolColumn get isDurationInSeconds => boolean()();
+  IntColumn get pace => integer()(); // In seconds
 }
-

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:fitnesstracker/utils/string_formatter.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -100,11 +101,11 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
               style: const TextStyle(fontSize: 18),
             ),
             Text(
-              "Total Time: ${_formatDuration(totalTime)}",
+              "Total Time: ${StringFormatter.formatDuration(totalTime)}",
               style: const TextStyle(fontSize: 18),
             ),
             Text(
-              "Average Pace: ${_formatDuration(((totalTime / (totalDistance / 1000)).floor()))} min/km",
+              "Average Pace: ${StringFormatter.formatDuration(((totalTime / (totalDistance / 1000)).floor()))} min/km",
               style: const TextStyle(fontSize: 18),
             ),
             SizedBox(height: 24),
@@ -157,7 +158,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                         interval: paceInterval,
                         reservedSize: 40,
                         getTitlesWidget: (double value, TitleMeta meta) {
-                          return Text(_formatDuration(value.floor()));
+                          return Text(
+                              StringFormatter.formatDuration(value.floor()));
                         },
                       ),
                     ),
@@ -167,7 +169,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                         interval: paceInterval,
                         reservedSize: 40,
                         getTitlesWidget: (double value, TitleMeta meta) {
-                          return Text(_formatDuration(value.floor()));
+                          return Text(
+                              StringFormatter.formatDuration(value.floor()));
                         },
                       ),
                     ),
@@ -201,25 +204,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
         ),
       ),
     );
-  }
-
-  // Format duration in hh:mm:ss
-  String _formatDuration(int totalSeconds) {
-    int hours = totalSeconds ~/ 3600;
-    int minutes = (totalSeconds % 3600) ~/ 60;
-    int seconds = totalSeconds % 60;
-    return [if (hours > 0) hours, minutes, seconds]
-        .map((e) => e.toString().padLeft(2, '0'))
-        .join(':');
-  }
-
-  // Format pace in min/km
-  String _formatPace(double speed) {
-    if (speed != 0) {
-      return _formatDuration((1000 / speed).floor());
-    } else {
-      return "--:--";
-    }
   }
 
   void _updateValues() {
