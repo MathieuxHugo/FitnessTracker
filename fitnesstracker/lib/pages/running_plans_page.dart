@@ -10,7 +10,7 @@ class RunningPlansPage extends StatefulWidget {
 
 class _RunningPlansPageState extends State<RunningPlansPage> {
   final RunningPlansService _runningPlansService = RunningPlansService();
-  late Future<List<RunningPlan>> _runningPlansFuture;
+  late Future<List<RunningPlanData>> _runningPlansFuture;
 
   @override
   void initState() {
@@ -22,7 +22,7 @@ class _RunningPlansPageState extends State<RunningPlansPage> {
     _runningPlansFuture = _runningPlansService.getRunningPlans();
   }
 
-  void _navigateToRunningPlan(RunningPlan plan) {
+  void _navigateToRunningPlan(RunningPlanData plan) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -37,7 +37,7 @@ class _RunningPlansPageState extends State<RunningPlansPage> {
       appBar: AppBar(
         title: Text("Running Plans"),
       ),
-      body: FutureBuilder<List<RunningPlan>>(
+      body: FutureBuilder<List<RunningPlanData>>(
         future: _runningPlansFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -67,7 +67,7 @@ class _RunningPlansPageState extends State<RunningPlansPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _navigateToRunningPlan(RunningPlan.createPlan(name: "", intervals: []));
+          _navigateToRunningPlan(RunningPlanData(name: "", intervals: []));
         },
         child: const Icon(Icons.add),
       ),

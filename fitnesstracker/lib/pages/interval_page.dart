@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../model/running_interval.dart';
-import '../model/running_plan.dart'; // Your RunningPlan and Interval models
+import '../model/running_plan.dart'; 
 
 class IntervalPage extends StatefulWidget {
-  final RunningPlan runningPlan;
+  final RunningPlanData runningPlan;
   final int intervalIndex;
 
   IntervalPage({
@@ -16,7 +16,7 @@ class IntervalPage extends StatefulWidget {
 }
 
 class _IntervalPageState extends State<IntervalPage> {
-  late RunningInterval interval;
+  late RunningIntervalData interval;
   late TextEditingController _nameController;
   late TextEditingController _durationController;
   late TextEditingController _paceMinutesController;
@@ -29,7 +29,7 @@ class _IntervalPageState extends State<IntervalPage> {
     interval = widget.runningPlan.intervals[widget.intervalIndex];
 
     // Initialize controllers with existing interval data
-    _nameController = TextEditingController(text: interval.name);
+    _nameController = TextEditingController(text: interval.name.toString());
     _durationController = TextEditingController(text: interval.duration.toString());
     _paceMinutesController = TextEditingController(text: (interval.pace ~/ 60).toString());
     _paceSecondsController = TextEditingController(text: (interval.pace % 60).toString());
@@ -54,12 +54,12 @@ class _IntervalPageState extends State<IntervalPage> {
       return;
     }
 
-    setState(() {
-      interval.name = name;
-      interval.duration = duration;
-      interval.isDurationInSeconds = isDurationInSeconds;
-      interval.pace = (paceMinutes * 60) + paceSeconds;
-    });
+    // setState(() {
+    //   interval.name = name;
+    //   interval.duration = duration;
+    //   interval.isDurationInSeconds = isDurationInSeconds;
+    //   interval.pace = (paceMinutes * 60) + paceSeconds;
+    // });
 
     Navigator.pop(context, true); // Return true to indicate a successful save
   }

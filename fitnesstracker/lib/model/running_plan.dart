@@ -1,10 +1,23 @@
-import 'package:fitnesstracker/model/running_interval.dart';
-import 'package:drift/drift.dart';
+import 'running_interval.dart';
 
-@DataClassName('RunningPlanData')
-class RunningPlans extends Table {
-  TextColumn get name => text()();
+class RunningPlanData {
+  final String name;
+  final List<RunningIntervalData> intervals;
 
-  @override
-  Set<Column> get primaryKey => {name};
+  RunningPlanData({
+    required this.name,
+    required this.intervals,
+  });
+
+  factory RunningPlanData.fromJson(Map<String, dynamic> json) => RunningPlanData(
+    name: json['name'],
+    intervals: (json['intervals'] as List)
+      .map((i) => RunningIntervalData.fromJson(i))
+      .toList(),
+  );
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'intervals': intervals.map((i) => i.toJson()).toList(),
+  };
 }

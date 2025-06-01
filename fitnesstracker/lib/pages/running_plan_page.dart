@@ -7,7 +7,7 @@ import '../model/running_plan.dart';
 import 'interval_page.dart';
 
 class RunningPlanPage extends StatefulWidget {
-  final RunningPlan runningPlan;
+  final RunningPlanData runningPlan;
   const RunningPlanPage({required this.runningPlan});
 
   @override
@@ -19,7 +19,7 @@ class _RunningPlanPageState extends State<RunningPlanPage> {
 
   void _addInterval() {
     int length =widget.runningPlan.intervals.length;
-    widget.runningPlan.intervals.add(RunningInterval(name: "Interval ${length+1}", duration: 300, isDurationInSeconds: true, pace: 360));
+    widget.runningPlan.intervals.add(RunningIntervalData(name: "Interval ${length+1}", duration: 300, isDurationInSeconds: true, pace: 360));
     _navigateToInterval(length);
   }
 
@@ -101,7 +101,7 @@ class _RunningPlanPageState extends State<RunningPlanPage> {
     );
   }
 
-  _displayDuration(RunningInterval interval) {
+  _displayDuration(RunningIntervalData interval) {
     return interval.isDurationInSeconds ? "${(interval.duration/60).floor()}:${interval.duration%60}":"${interval.duration}m";
   }
 }
