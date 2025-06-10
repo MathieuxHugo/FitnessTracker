@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../activity/activity.dart';
 
-
 class NewActivityPage extends StatefulWidget {
   const NewActivityPage({super.key});
   @override
@@ -18,25 +17,26 @@ class _NewActivityPageState extends State<NewActivityPage> {
   DateTime start = DateTime.now(), startPause = DateTime.now();
   Duration pauseDuration = Duration.zero;
   bool _isTracking = false; // Track if tracking is started
-  bool _isPaused = false;  // Track if tracking has been paused
+  bool _isPaused = false; // Track if tracking has been paused
   late Activity activity;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     activity = createActivity();
   }
 
-  Activity createActivity(){
-    return RunningActivity();
+  Activity createActivity() {
+    return RunningActivity(minSpeed: 0.5, maxSpeed: 15);
   }
 
   void _startTimer() {
     start = DateTime.now();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        if(!_isPaused){
-          timerText = _formatTime((DateTime.now().difference(start)-pauseDuration).inSeconds);
+        if (!_isPaused) {
+          timerText = _formatTime(
+              (DateTime.now().difference(start) - pauseDuration).inSeconds);
         }
       });
     });
@@ -54,15 +54,14 @@ class _NewActivityPageState extends State<NewActivityPage> {
   }
 
   void _onStart() {
-
-    activity?.start().then((onValue) {
-        setState(() {
-          _isTracking = true;
-          _isPaused = false;
-          timerText = "00:00:00";
-        });
-        _startTimer();
+    activity.start().then((onValue) {
+      setState(() {
+        _isTracking = true;
+        _isPaused = false;
+        timerText = "00:00:00";
       });
+      _startTimer();
+    });
   }
 
   void _onPause() {
@@ -82,7 +81,7 @@ class _NewActivityPageState extends State<NewActivityPage> {
   }
 
   void _onSave() {
-    activity?.save().then((onValue){
+    activity?.save().then((onValue) {
       setState(() {
         _isTracking = false;
         _isPaused = false;
@@ -175,6 +174,4 @@ class _NewActivityPageState extends State<NewActivityPage> {
       );
     }
   }
-
-
 }

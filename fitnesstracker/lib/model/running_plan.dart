@@ -1,21 +1,23 @@
-import 'package:fitnesstracker/model/running_interval.dart';
+import 'running_interval.dart';
 
-class RunningPlan {
+class RunningPlanData {
   final String name;
-  final List<RunningInterval> intervals;
+  final List<RunningIntervalData> intervals;
 
-  RunningPlan({
+  RunningPlanData({
     required this.name,
     required this.intervals,
   });
 
-  RunningPlan.createPlan({
-    required this.name,
-    required this.intervals,
-  });
+  factory RunningPlanData.fromJson(Map<String, dynamic> json) => RunningPlanData(
+    name: json['name'],
+    intervals: (json['intervals'] as List)
+      .map((i) => RunningIntervalData.fromJson(i))
+      .toList(),
+  );
 
   Map<String, dynamic> toJson() => {
     'name': name,
-    'intervals': intervals.map((interval) => interval.toJson()).toList(),
+    'intervals': intervals.map((i) => i.toJson()).toList(),
   };
 }

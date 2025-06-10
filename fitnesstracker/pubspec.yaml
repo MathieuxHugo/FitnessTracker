@@ -44,6 +44,10 @@ dependencies:
   flutter_map: ^7.0.2
   latlong2: ^0.9.1
   reorderable_list: ^0.0.1
+  archive: ^4.0.2
+  flutter_email_sender: ^6.0.3
+  drift: ^2.23.1
+  build_runner: ^2.4.13
 
 dev_dependencies:
   flutter_test:

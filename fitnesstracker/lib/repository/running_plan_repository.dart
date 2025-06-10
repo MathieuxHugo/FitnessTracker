@@ -2,9 +2,11 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../model/running_interval.dart';
 import '../model/running_plan.dart';
+import 'dart:developer';
 
 class RunningPlanRepository {
-  static final RunningPlanRepository _instance = RunningPlanRepository._internal();
+  static final RunningPlanRepository _instance =
+      RunningPlanRepository._internal();
   factory RunningPlanRepository() => _instance;
   RunningPlanRepository._internal();
 
@@ -18,6 +20,7 @@ class RunningPlanRepository {
 
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
+
     final path = join(dbPath, 'running_plan_database.db');
 
     return await openDatabase(
@@ -47,8 +50,7 @@ class RunningPlanRepository {
     ''');
   }
 
-  // Save a RunningPlan and its Intervals
-  Future<void> saveRunningPlan(RunningPlan plan) async {
+  Future<void> saveRunningPlan(RunningPlanData plan) async {
     final db = await database;
 
     // Insert running plan details
@@ -75,12 +77,12 @@ class RunningPlanRepository {
   }
 
   // Retrieve all RunningPlans with associated RunningIntervals
-  Future<List<RunningPlan>> retrieveRunningPlans() async {
+  Future<List<RunningPlanData>> retrieveRunningPlans() async {
     final db = await database;
 
     // Get all running plans
     final planMaps = await db.query('running_plans');
-    List<RunningPlan> runningPlans = [];
+    List<RunningPlanData> runningPlans = [];
 
     for (var planMap in planMaps) {
       // Get associated intervals for each plan
@@ -90,8 +92,8 @@ class RunningPlanRepository {
         whereArgs: [planMap['name']],
       );
 
-      List<RunningInterval> intervals = intervalMaps.map((interval) {
-        return RunningInterval(
+      List<RunningIntervalData> intervals = intervalMaps.map((interval) {
+        return RunningIntervalData(
           name: interval['name'] as String,
           duration: interval['duration'] as int,
           isDurationInSeconds: (interval['isDurationInSeconds'] as int) == 1,
@@ -99,7 +101,7 @@ class RunningPlanRepository {
         );
       }).toList();
 
-      runningPlans.add(RunningPlan(
+      runningPlans.add(RunningPlanData(
         name: planMap['name'] as String,
         intervals: intervals,
       ));

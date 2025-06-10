@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../model/position_data.dart';
 import '../model/activity_data.dart';
+import 'dart:developer';
 
 class ActivityRepository {
   static final ActivityRepository _instance = ActivityRepository._internal();
@@ -19,7 +20,6 @@ class ActivityRepository {
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'activity_database.db');
-
     return await openDatabase(
       path,
       version: 1,
@@ -56,7 +56,7 @@ class ActivityRepository {
   // Save an Activity and its Positions
   Future<void> saveActivity(ActivityData activity) async {
     final db = await database;
-    
+
     // Insert activity details
     await db.insert(
       'activities',
