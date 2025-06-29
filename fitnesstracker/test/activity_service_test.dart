@@ -30,7 +30,7 @@ void main() {
         createPosition(40.7129, -74.0070, 10.0, DateTime.now()),
       ];
 
-      await service.saveActivity(positions);
+      await service.saveRunningActivity(positions);
 
       verify(mockRepo.saveActivity(any)).called(1);
     });

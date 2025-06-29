@@ -2,7 +2,9 @@ import 'package:geolocator/geolocator.dart';
 
 import '../model/activity_data.dart';
 import '../model/position_data.dart';
+import '../model/exercise.dart';
 import '../repository/json_repository.dart';
+import '../utils/string_formatter.dart';
 
 class ActivityService {
   final double accuracyThreshold;
@@ -53,28 +55,58 @@ class ActivityService {
   }
 
 
-  Future<void> saveActivity(List<Position> positions) async {
+  Future<void> saveActivity(ActivityData activity) async {
+    await _repository.saveActivity(activity);
+  }
+
+  Future<void> saveRunningActivity(List<Position> positions) async {
     positionsData = [];
     double distance = 0;
     Position prev = positions.first;
     DateTime start = prev.timestamp;
+    DateTime end = positions.last.timestamp;
     positionsData.add(positionToPositionData(prev, 0.0, 0));
+    
+    double totalSpeed = 0;
+    int speedCount = 0;
+    
     for(int i = 1; i< positions.length; i++){
       distance+=Geolocator.distanceBetween(prev.latitude, prev.longitude, positions[i].latitude, positions[i].longitude);
       prev=positions[i];
       positionsData.add(positionToPositionData(prev, distance, prev.timestamp.difference(start).inSeconds));
+      
+      if (prev.speed > 0) {
+        totalSpeed += prev.speed;
+        speedCount++;
+      }
     }
 
     if(positionsData.isEmpty){
       throw "Bad Accuracy";
     }
     else{
+      double averageSpeed = speedCount > 0 ? totalSpeed / speedCount : 0;
+      String averagePace = averageSpeed > 0 ? StringFormatter.formatPaceFromSpeed(averageSpeed) : "--:--";
+      
+      RunningExercise runningExercise = RunningExercise(
+        id: "${DateTime.now().toIso8601String()}_running",
+        startTime: start,
+        endTime: end,
+        duration: end.difference(start).inSeconds,
+        positions: positionsData,
+        totalDistance: distance,
+        averageSpeed: averageSpeed,
+        averagePace: averagePace,
+      );
+      
       ActivityData activity = ActivityData(
         id: DateTime.now().toIso8601String(),
-        startTime: positions.first.timestamp,
-        totalTime: positions.first.timestamp.difference(positions.last.timestamp).inSeconds,
-        totalDistance: distance,
-        positions: positionsData,
+        startTime: start,
+        endTime: end,
+        exercises: [runningExercise],
+        totalTime: end.difference(start).inSeconds,
+        name: "Running Activity",
+        description: "Automatically tracked running session",
       );
       await _repository.saveActivity(activity);
     }

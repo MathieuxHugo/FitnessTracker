@@ -55,6 +55,16 @@ class MockJsonRepository extends _i1.Mock implements _i2.JsonRepository {
       ) as _i3.Future<List<_i4.ActivityData>>);
 
   @override
+  _i3.Future<void> deleteActivity(String? activityId) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteActivity,
+          [activityId],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
   _i3.Future<void> saveRunningPlan(_i5.RunningPlanData? plan) =>
       (super.noSuchMethod(
         Invocation.method(
