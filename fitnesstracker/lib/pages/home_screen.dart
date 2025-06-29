@@ -11,17 +11,33 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final NewActivityPage activityPage = NewActivityPage();
-  final PreviousActivitiesPage previousActivitiesPage =
-      PreviousActivitiesPage();
-  final RunningPlansPage runningPlansPage = RunningPlansPage();
+  // Create keys for each page to access their state
+  final GlobalKey<PreviousActivitiesPageState> _previousActivitiesKey =
+      GlobalKey<PreviousActivitiesPageState>();
+      
+  late final NewActivityPage activityPage = NewActivityPage();
+  late final PreviousActivitiesPage previousActivitiesPage =
+      PreviousActivitiesPage(key: _previousActivitiesKey);
+  late final RunningPlansPage runningPlansPage = RunningPlansPage();
 
   late final List<Widget> _pages = [activityPage, previousActivitiesPage, runningPlansPage];
 
   void _onItemTapped(int index) {
+    // Previous index
+    int previousIndex = _selectedIndex;
+    
     setState(() {
       _selectedIndex = index;
     });
+    
+    // If we're switching to the Previous Activities tab
+    if (index == 1 && previousIndex != 1) {
+      // Use the post-frame callback to ensure this runs after the build is complete
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Call the onPageVisible method on the state
+        (_previousActivitiesKey.currentState as PreviousActivitiesPageState?)?.onPageVisible();
+      });
+    }
   }
 
   @override

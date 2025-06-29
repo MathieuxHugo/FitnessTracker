@@ -6,20 +6,39 @@ import 'package:provider/provider.dart';
 import '../model/activity_data.dart';
 import 'activity_detail_page.dart';
 
+// Make the state class name public (without underscore) so it can be referenced from home_screen.dart
 class PreviousActivitiesPage extends StatefulWidget {
+  const PreviousActivitiesPage({Key? key}) : super(key: key);
+
   @override
-  _PreviousActivitiesPageState createState() => _PreviousActivitiesPageState();
+  PreviousActivitiesPageState createState() => PreviousActivitiesPageState();
 }
 
-class _PreviousActivitiesPageState extends State<PreviousActivitiesPage> {
+class PreviousActivitiesPageState extends State<PreviousActivitiesPage> {
   late ActivityService _activityService;
   List<ActivityData> _activities = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final jsonRepository = Provider.of<JsonRepository>(context);
     _activityService = ActivityService(jsonRepository);
+    _loadActivities();
+  }
+
+
+  // Method called when the page becomes visible
+  void onPageVisible() {
     _loadActivities();
   }
 
