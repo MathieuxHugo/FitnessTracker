@@ -3,9 +3,12 @@ import 'dart:math';
 import 'package:fitnesstracker/utils/string_formatter.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../model/activity_data.dart';
 import '../model/position_data.dart';
+import '../repository/json_repository.dart';
+import '../service/activity_service.dart';
 import 'run_map_page.dart';
 
 class ActivityDetailPage extends StatefulWidget {
@@ -53,6 +56,14 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Activity Details'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              _showDeleteConfirmationDialog();
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -243,5 +254,41 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 (position.time - prevPosition.time) >
             speedThreshold) &&
         position.accuracy < accuracyThreshold;
+  }
+  
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Activity'),
+          content: const Text('Are you sure you want to delete this activity? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close the dialog
+                
+                // Get the ActivityService
+                final jsonRepository = Provider.of<JsonRepository>(context, listen: false);
+                final activityService = ActivityService(jsonRepository);
+                
+                // Delete the activity
+                await activityService.deleteActivity(widget.activity.id);
+                
+                // Return to previous screen
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

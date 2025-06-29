@@ -83,4 +83,8 @@ class ActivityService {
   Future<List<ActivityData>> getAllActivities(){
     return _repository.retrieveActivities();
   }
+  
+  Future<void> deleteActivity(String activityId) async {
+    await _repository.deleteActivity(activityId);
+  }
 }

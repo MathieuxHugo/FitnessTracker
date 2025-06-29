@@ -32,6 +32,13 @@ class JsonRepository {
     }
     return [];
   }
+  
+  Future<void> deleteActivity(String activityId) async {
+    final activities = await retrieveActivities();
+    activities.removeWhere((activity) => activity.id == activityId);
+    await _storageService.writeData(
+        _activityFileName, {'activities': activities.map((a) => a.toJson()).toList()});
+  }
 
   Future<void> saveRunningPlan(RunningPlanData plan) async {
     final plans = await retrieveRunningPlans();
