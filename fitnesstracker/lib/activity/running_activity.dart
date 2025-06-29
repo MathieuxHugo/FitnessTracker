@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:fitnesstracker/activity/activity.dart';
+import 'package:fitnesstracker/repository/json_repository.dart';
 import 'package:fitnesstracker/utils/string_formatter.dart';
 import 'package:fitnesstracker/widgets/running_widget.dart';
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -16,7 +16,11 @@ class RunningActivity extends Activity {
   double minSpeed = 0.5;
   String pace = "--:--";
 
-  RunningActivity({required this.maxSpeed, required this.minSpeed});
+  RunningActivity(
+      {required this.maxSpeed,
+      required this.minSpeed,
+      required JsonRepository repository})
+      : super(repository);
 
   double getCurrentSpeed() {
     if (positions.isNotEmpty) {

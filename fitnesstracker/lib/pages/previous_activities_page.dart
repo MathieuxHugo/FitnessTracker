@@ -1,8 +1,9 @@
+import 'package:fitnesstracker/repository/json_repository.dart';
 import 'package:fitnesstracker/service/activity_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../model/activity_data.dart';
-import '../repository/activity_repository.dart';
 import 'activity_detail_page.dart';
 
 class PreviousActivitiesPage extends StatefulWidget {
@@ -11,19 +12,19 @@ class PreviousActivitiesPage extends StatefulWidget {
 }
 
 class _PreviousActivitiesPageState extends State<PreviousActivitiesPage> {
+  late ActivityService _activityService;
   List<ActivityData> _activities = [];
 
-  ActivityService activityService = ActivityService();
-
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final jsonRepository = Provider.of<JsonRepository>(context);
+    _activityService = ActivityService(jsonRepository);
     _loadActivities();
   }
 
   Future<void> _loadActivities() async {
-    // Fetch activities from the database
-    List<ActivityData> activities = await activityService.getAllActivities();
+    List<ActivityData> activities = await _activityService.getAllActivities();
     setState(() {
       _activities = activities;
     });

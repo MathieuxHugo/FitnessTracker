@@ -1,5 +1,9 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'running_interval.dart';
 
+part 'running_plan.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class RunningPlanData {
   final String name;
   final List<RunningIntervalData> intervals;
@@ -9,15 +13,8 @@ class RunningPlanData {
     required this.intervals,
   });
 
-  factory RunningPlanData.fromJson(Map<String, dynamic> json) => RunningPlanData(
-    name: json['name'],
-    intervals: (json['intervals'] as List)
-      .map((i) => RunningIntervalData.fromJson(i))
-      .toList(),
-  );
+  factory RunningPlanData.fromJson(Map<String, dynamic> json) =>
+      _$RunningPlanDataFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-    'name': name,
-    'intervals': intervals.map((i) => i.toJson()).toList(),
-  };
+  Map<String, dynamic> toJson() => _$RunningPlanDataToJson(this);
 }

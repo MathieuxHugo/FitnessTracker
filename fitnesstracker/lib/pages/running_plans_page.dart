@@ -1,6 +1,8 @@
+import 'package:fitnesstracker/repository/json_repository.dart';
+import 'package:fitnesstracker/service/running_plan_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../model/running_plan.dart';
-import '../service/running_plan_service.dart';
 import 'running_plan_page.dart';
 
 class RunningPlansPage extends StatefulWidget {
@@ -9,12 +11,14 @@ class RunningPlansPage extends StatefulWidget {
 }
 
 class _RunningPlansPageState extends State<RunningPlansPage> {
-  final RunningPlansService _runningPlansService = RunningPlansService();
+  late RunningPlansService _runningPlansService;
   late Future<List<RunningPlanData>> _runningPlansFuture;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final jsonRepository = Provider.of<JsonRepository>(context);
+    _runningPlansService = RunningPlansService(jsonRepository);
     _loadRunningPlans();
   }
 

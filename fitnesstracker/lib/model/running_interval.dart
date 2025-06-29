@@ -1,4 +1,9 @@
 // running_interval.dart
+import 'package:json_annotation/json_annotation.dart';
+
+part 'running_interval.g.dart';
+
+@JsonSerializable()
 class RunningIntervalData {
   final int? id; // null for new intervals before insertion
   //final String planName;
@@ -16,21 +21,8 @@ class RunningIntervalData {
     required this.pace,
   });
 
-  factory RunningIntervalData.fromJson(Map<String, dynamic> json) => RunningIntervalData(
-    id: json['id'],
-    //planName: json['planName'],
-    name: json['name'],
-    duration: json['duration'],
-    isDurationInSeconds: json['isDurationInSeconds'],
-    pace: json['pace'],
-  );
+  factory RunningIntervalData.fromJson(Map<String, dynamic> json) =>
+      _$RunningIntervalDataFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-    if (id != null) 'id': id,
-    //'planName': planName,
-    'name': name,
-    'duration': duration,
-    'isDurationInSeconds': isDurationInSeconds,
-    'pace': pace,
-  };
+  Map<String, dynamic> toJson() => _$RunningIntervalDataToJson(this);
 }

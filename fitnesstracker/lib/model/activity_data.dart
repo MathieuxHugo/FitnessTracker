@@ -1,6 +1,10 @@
 
+import 'package:json_annotation/json_annotation.dart';
 import 'position_data.dart';
 
+part 'activity_data.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class ActivityData {
   final String id;
   final DateTime startTime;
@@ -15,10 +19,8 @@ class ActivityData {
     required this.totalTime,
   });
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'startTime': startTime.toIso8601String(),
-    'positions': positions.map((pos) => pos.toJson()).toList(),
-    'totalDistance': totalDistance,
-  };
+  factory ActivityData.fromJson(Map<String, dynamic> json) =>
+      _$ActivityDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ActivityDataToJson(this);
 }

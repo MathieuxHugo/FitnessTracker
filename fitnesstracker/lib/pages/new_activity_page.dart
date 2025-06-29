@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:fitnesstracker/activity/running_activity.dart';
+import 'package:fitnesstracker/repository/json_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../activity/activity.dart';
 
@@ -21,13 +23,15 @@ class _NewActivityPageState extends State<NewActivityPage> {
   late Activity activity;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     activity = createActivity();
   }
 
   Activity createActivity() {
-    return RunningActivity(minSpeed: 0.5, maxSpeed: 15);
+    final jsonRepository = Provider.of<JsonRepository>(context, listen: false);
+    return RunningActivity(
+        minSpeed: 0.5, maxSpeed: 15, repository: jsonRepository);
   }
 
   void _startTimer() {
@@ -66,7 +70,7 @@ class _NewActivityPageState extends State<NewActivityPage> {
 
   void _onPause() {
     setState(() {
-      activity?.pause();
+      activity.pause();
       _isPaused = true;
       startPause = DateTime.now();
     });
@@ -74,6 +78,7 @@ class _NewActivityPageState extends State<NewActivityPage> {
 
   void _onResume() {
     setState(() {
+      activity.resume();
       _isPaused = false;
       _isTracking = true;
       pauseDuration += DateTime.now().difference(startPause);
@@ -81,7 +86,7 @@ class _NewActivityPageState extends State<NewActivityPage> {
   }
 
   void _onSave() {
-    activity?.save().then((onValue) {
+    activity.save().then((onValue) {
       setState(() {
         _isTracking = false;
         _isPaused = false;
