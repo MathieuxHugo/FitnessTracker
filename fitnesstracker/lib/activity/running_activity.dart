@@ -87,7 +87,7 @@ class RunningActivity extends Activity {
             1000;
         double speed = distanceSinceLast / timeSinceLast;
         if (speed > 0.5) {
-          pace = StringFormatter.formatPace(speed);
+          pace = StringFormatter.formatPaceFromSpeed(speed);
         } else {
           pace = StringFormatter.getNonePace();
         }

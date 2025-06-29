@@ -1,4 +1,12 @@
 class StringFormatter {
+  static String NONE_PACE = "--:--";
+  static String NONE_DURATION = "--:--:--";
+  static String NONE_DISTANCE = "--";
+  static String distanceUnit = "km";
+  static String speedUnit = "km/h";
+  static String paceUnit = "min/km";
+  static String durationUnit = "hh:mm:ss";
+
   static String formatDuration(int totalSeconds) {
     /**
      * Format duration in hh:mm:ss from duration in seconds.
@@ -11,18 +19,23 @@ class StringFormatter {
         .join(':');
   }
 
-  static String formatPace(double speed) {
-    /**
-     * Format speed to mm:ss from speed in m/s
-     */
+  static String formatPaceFromSpeed(double speed) {
     if (speed != 0) {
       return formatDuration((1000 / speed).floor());
     } else {
-      return "--:--";
+      return NONE_PACE;
+    }
+  }
+
+  static String formatPace(double distance, int time) {
+    if (distance > 0 && time > 0) {
+      return "${formatDuration((time / distance * 1000).floor())} $paceUnit";
+    } else {
+      return NONE_PACE;
     }
   }
 
   static String getNonePace() {
-    return "--:--";
+    return NONE_PACE;
   }
 }

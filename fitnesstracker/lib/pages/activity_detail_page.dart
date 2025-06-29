@@ -105,7 +105,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
               style: const TextStyle(fontSize: 18),
             ),
             Text(
-              "Average Pace: ${StringFormatter.formatDuration(((totalTime / (totalDistance / 1000)).floor()))} min/km",
+              "Average Pace: ${StringFormatter.formatPace(totalDistance, totalTime)}",
               style: const TextStyle(fontSize: 18),
             ),
             SizedBox(height: 24),
